@@ -1,0 +1,82 @@
+﻿@model Actor
+@{
+    ViewData["Title"] = "Update Actor";
+}
+
+<div class="card shadow border">
+    <div class="card-header bg-warning bg-gradient ml-0 py-4">
+        <div class="col-12 text-center">
+            <h2 class="card-title text-white">Update Actor</h2>
+        </div>
+    </div>
+    <div class="card-body">
+        <form asp-action="Update" enctype="multipart/form-data">
+            <input hidden asp-for="PreviewUrl" />
+
+            <div class="form-group mb-3">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Preview" class="control-label"></label><br />
+                <input asp-for="Preview" type="file" class="form-control-file" accept="image/*" id="imageInput" />
+                <span asp-validation-for="Preview" class="text-danger"></span>
+            </div>
+
+            <!-- Current image preview section -->
+            <div class="form-group mb-3">
+                @if (Model.Preview != null)
+                {
+                    <img src="@Model.Preview" id="currentImagePreview" style="max-width: 100%; max-height: 400px;" />
+                }
+                else if (!string.IsNullOrEmpty(Model.PreviewUrl))
+                {
+                    <img src="@Model.PreviewUrl" id="currentImagePreview" style="max-width: 100%; max-height: 400px;" />
+                }
+                else
+                {
+                    <p>No image available.</p>
+                }
+            </div>
+
+            <!-- New image preview section -->
+            <div class="form-group mb-3">
+                <img id="imagePreview" style="display:none; max-width: 100%; max-height: 400px;" />
+            </div>
+
+            <div class="col-12">
+                <button type="submit" class="w-100 btn btn-lg btn-outline-warning">Update</button>
+                <a asp-action="Index" class="w-100 btn btn-lg btn-secondary mt-2">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        document.getElementById('imageInput').addEventListener('change', function (event) {
+            var imgPreview = document.getElementById('imagePreview');
+            var currentImagePreview = document.getElementById('currentImagePreview');
+            var file = event.target.files[0];
+
+            if (file && file.type.startsWith('image/')) {
+                var fileURL = URL.createObjectURL(file);
+                imgPreview.src = fileURL;
+                imgPreview.style.display = 'block'; // Show the new image preview
+                if (currentImagePreview) {
+                    currentImagePreview.style.display = 'none'; // Hide the current image preview
+                }
+            } else {
+                imgPreview.style.display = 'none'; // Hide the new image preview if no valid image is selected
+                imgPreview.src = ''; // Clear the new image source
+                if (currentImagePreview) {
+                    currentImagePreview.style.display = 'block'; // Show the current image preview again
+                }
+            }
+        });
+    </script>
+}

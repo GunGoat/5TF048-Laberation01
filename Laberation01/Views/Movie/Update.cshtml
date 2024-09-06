@@ -1,0 +1,91 @@
+﻿@model MovieViewModel
+@{
+    ViewData["Title"] = "Update Movie";
+}
+
+<div class="card shadow border">
+    <div class="card-header bg-warning bg-gradient ml-0 py-4">
+        <div class="col-12 text-center">
+            <h2 class="card-title text-white">Update Movie</h2>
+        </div>
+    </div>
+    <div class="card-body">
+        <form asp-action="Update" enctype="multipart/form-data">
+            <input type="hidden" asp-for="Movie.Id" />
+            <input type="hidden" asp-for="Movie.PreviewUrl" />
+
+            <div class="form-group mb-3">
+                <label asp-for="Movie.Title" class="control-label"></label>
+                <input asp-for="Movie.Title" class="form-control" />
+                <span asp-validation-for="Movie.Title" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Movie.Description" class="control-label"></label>
+                <textarea asp-for="Movie.Description" class="form-control"></textarea>
+                <span asp-validation-for="Movie.Description" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Movie.ReleaseDate" class="control-label"></label>
+                <input asp-for="Movie.ReleaseDate" type="date" class="form-control" />
+                <span asp-validation-for="Movie.ReleaseDate" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Movie.RunningTime" class="control-label"></label>
+                <input asp-for="Movie.RunningTime" type="time" class="form-control" />
+                <span asp-validation-for="Movie.RunningTime" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Movie.Preview" class="control-label"></label><br />
+                <input asp-for="Movie.Preview" type="file" class="form-control-file" accept="video/*" id="videoInput" />
+                <span asp-validation-for="Movie.Preview" class="text-danger"></span>
+            </div>
+
+            <!-- Video preview section -->
+            <div class="form-group mb-3">
+                @if(Model.Movie.PreviewUrl is not null)
+                {
+                    <video id="videoPreview" controls style="width: 100%; max-height: 400px;" src="@Model.Movie.PreviewUrl"></video>
+                }
+                else
+                {
+                    <video id="videoPreview" controls style="display:none; width: 100%; max-height: 400px;"></video>
+                }
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="SelectedActorIds" class="control-label">Actors</label>
+                <select asp-for="SelectedActorIds" class="form-control" asp-items="Model.Actors" multiple></select>
+                <span asp-validation-for="SelectedActorIds" class="text-danger"></span>
+            </div>
+
+            <div class="col-12">
+                <button type="submit" class="w-100 btn btn-lg btn-outline-warning">Update</button>
+                <a asp-action="Index" class="w-100 btn btn-lg btn-secondary mt-2">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        document.getElementById('videoInput').addEventListener('change', function (event) {
+            var video = document.getElementById('videoPreview');
+            var file = event.target.files[0];
+
+            if (file && file.type.startsWith('video/')) {
+                var fileURL = URL.createObjectURL(file);
+                video.src = fileURL;
+                video.style.display = 'block'; // Show the video element
+            } else {
+                video.style.display = 'none'; // Hide the video element if no valid video is selected
+                video.src = ''; // Clear the video source
+            }
+        });
+    </script>
+}

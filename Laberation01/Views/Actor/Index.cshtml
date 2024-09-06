@@ -1,0 +1,74 @@
+﻿@model IEnumerable<Actor>
+
+@{
+    ViewData["Title"] = "Actors List";
+}
+
+<div class="container">
+    <!-- Page header with Create button, Sort By dropdown, and Search bar -->
+    <div class="d-flex justify-content-between align-items-center my-4">
+
+        <!-- Create button -->
+        <a asp-action="Create" class="btn btn-success">Create Actor</a>
+
+        <!-- Sort By dropdown, Search bar, and Query button form -->
+        <div class="d-flex align-items-center">
+            <form class="d-flex" method="get" asp-action="Index">
+                <select class="form-select me-2" name="OrderBy">
+                    <option value="@SD.SortById">Id</option>
+                    <option value="@SD.SortByName">Name</option>
+                </select>
+                <input type="text" class="form-control me-2" placeholder="Search..." name="searchQuery" />
+                <button type="submit" class="btn btn-primary me-2">Query</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Actor Cards List -->
+    <div class="row">
+        @foreach (var actor in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 position-relative">
+                    <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">@actor.Name</h5>
+                        <div class="btn-group" role="group">
+                            <a asp-controller="Actor" asp-action="Update" asp-route-id="@actor.Id" class="btn btn-warning">Edit</a>
+                            <a asp-controller="Actor" asp-action="Delete" asp-route-id="@actor.Id" class="btn btn-danger">Delete</a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        @if (!string.IsNullOrEmpty(actor.PreviewUrl))
+                        {
+                            <div class="image-container">
+                                <img src="@actor.PreviewUrl" class="img-fluid" alt="@actor.Name">
+                            </div>
+                        }
+                        else
+                        {
+                            <p>No preview available</p>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    .image-container {
+        width: 100%;
+        padding-top: 100%; /* Creates a 1:1 aspect ratio container */
+        position: relative;
+        overflow: hidden;
+    }
+
+        .image-container img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Ensures the image covers the container and crops excess */
+        }
+</style>

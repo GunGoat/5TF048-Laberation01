@@ -1,0 +1,127 @@
+﻿@model IEnumerable<Movie>
+@{
+    ViewData["Title"] = "Movies List";
+    var currentSortOrder = ViewData[SD.SortBy]?.ToString();
+    var searchQuery = ViewBag.SearchQuery;
+}
+
+@functions {
+    public string CreateOption(string value, string displayText, string currentSortOrder)
+    {
+        var selected = value == currentSortOrder ? "selected" : "";
+        return $"<option value=\"{value}\" {selected}>{displayText}</option>";
+    }
+}
+
+<div class="container mt-4 movie-card-container">
+    <!-- Page header with Create button, Sort By dropdown, and Search bar -->
+    <div class="d-flex justify-content-between align-items-center my-4">
+
+        <!-- Create button -->
+        <a asp-action="Create" class="btn btn-success">Create Movie</a>
+
+        <!-- Sort By dropdown, Search bar, and Query button form -->
+        <div class="d-flex align-items-center">
+            <form class="d-flex" method="get" asp-action="Index">
+                <select class="form-select me-2" name="OrderBy">
+                    @Html.Raw(CreateOption(SD.SortByTitle, "Title", currentSortOrder))
+                    @Html.Raw(CreateOption(SD.SortByReleaseDate, "Release Date", currentSortOrder))
+                    @Html.Raw(CreateOption(SD.SortByRunningTime, "Running Time", currentSortOrder))
+                </select>
+                <input type="text" class="form-control me-2" placeholder="Search..." name="SearchQuery" value="@searchQuery" />
+                <button type="submit" class="btn btn-primary me-2">Query</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="row">
+        @foreach (var movie in Model)
+        {
+            <div class="col-md-6 mb-4">
+                <div class="card h-100 position-relative">
+                    <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">@movie.Title</h5>
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-primary" data-bs-toggle="collapse" href="#description-@movie.Id">Info</button>
+                            <a asp-controller="Movie" asp-action="Update" asp-route-id="@movie.Id" class="btn btn-warning">Edit</a>
+                            <a asp-controller="Movie" asp-action="Delete" asp-route-id="@movie.Id" class="btn btn-danger">Delete</a>
+                        </div>
+                    </div>
+                    @if (!string.IsNullOrEmpty(movie.PreviewUrl))
+                    {
+                        <div class="position-relative">
+                            <video src="@movie.PreviewUrl" class="card-img-bottom w-100" loop muted onmouseover="this.play()" onmouseout="this.pause();"></video>
+                            <div class="overlay d-flex flex-column justify-content-center align-items-center text-white">
+                                <div class="collapse" id="description-@movie.Id">
+
+                                    <!-- Description Section -->
+                                    <p class="overlay-text">@movie.Description</p>
+
+                                    <!-- Actors Section -->
+                                    @if (movie.Actors.Any())
+                                    {
+                                        <p class="overlay-text">
+                                            <strong>Actors:</strong>
+                                            @foreach (var actor in movie.Actors)
+                                            {
+                                                <span>@actor.Name</span>
+                                                @if (actor != movie.Actors.Last())
+                                                {
+                                                    <span>, </span>
+                                                }
+                                            }
+                                        </p>
+                                    }
+                                    else
+                                    {
+                                        <p class="overlay-text"><strong>Actors:</strong> No actors listed.</p>
+                                    }
+
+                                    <!-- More Info -->
+                                    <p class="overlay-text">
+                                        <small class="text-muted">Release Date: @movie.ReleaseDate.ToString("yyyy-MM-dd")</small><br />
+                                        <small class="text-muted">Running Time: @movie.RunningTime.Hours hours @movie.RunningTime.Minutes minutes</small>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    .movie-card-container .position-relative {
+        position: relative;
+    }
+
+    .movie-card-container .video {
+        background-color: black;
+    }
+
+    .movie-card-container .overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(0, 0, 0, 0.6); /* Black background with transparency */
+        color: white;
+        padding: 0px;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .movie-card-container .collapse {
+        padding: 10px;
+    }
+
+    .movie-card-container .overlay-text {
+        font-size: 0.875rem; /* Smaller font size */
+        margin-bottom: 5px;
+    }
+</style>
